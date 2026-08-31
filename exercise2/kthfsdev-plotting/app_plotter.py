@@ -20,7 +20,8 @@ class PlotterApp(QtWidgets.QMainWindow):
         self.f = 1
 
         # Declare control flags
-        self.start_stop_flag = 0      
+        self.start_stop_flag = 0   
+        self.grid_toggle_flag = 0   
 
         # Create UI elements
         self.set_UI()
@@ -157,6 +158,7 @@ class PlotterApp(QtWidgets.QMainWindow):
         # Add Grid button
         self.grid_button = QtWidgets.QPushButton('Grid Toggle')
         main_layout.addWidget(self.grid_button,0,3)
+        self.grid_button.clicked.connect(self.grid_toggle)
 
         # Add custom export button
         self.export_button = QtWidgets.QPushButton('export')
@@ -197,6 +199,16 @@ class PlotterApp(QtWidgets.QMainWindow):
             self.data_timer.stop()
             self.drawing_timer.stop()
 
+    def grid_toggle(self):
+        "Add grid to both graph according to toggled state"
+
+        self.grid_toggle_flag = not self.grid_toggle_flag               
+        self.input_dynamic_ax.grid(self.grid_toggle_flag)
+        self.output_dynamic_ax.grid(self.grid_toggle_flag)
+
+        self.line_input.figure.canvas.draw_idle()
+        self.line_output.figure.canvas.draw_idle() 
+        
 
 if __name__ == '__main__':
     
