@@ -74,6 +74,7 @@ class PlotterApp(QtWidgets.QMainWindow):
         # QPushButtons
         self.start_stop_button.clicked.connect(self.start_stop)
         self.grid_button.clicked.connect(self.grid_toggle)
+        self.reset_button.clicked.connect(self.reset)
 
 
     def set_initial_values(self):
@@ -326,6 +327,61 @@ class PlotterApp(QtWidgets.QMainWindow):
         """
         self.line_output.set_visible(self.output_function_checkbox.isChecked())
         self.dynamic_output_canvas.draw_idle()
+
+    def reset_plots(self):
+        """
+        Helper method for resetting plots to their initial state
+        """
+        # Recalculate functions with intial t_data
+        self.update_functions()
+
+        # Set reset data
+        self.line_input.set_data(self.t_data, self.l_ydata)
+        self.line_output.set_data(self.t_data, self.h_ydata)
+
+        # Reset limits
+        self.input_dynamic_ax.set_xlim(self.t_data[0], self.t_data[-1])
+        self.output_dynamic_ax.set_xlim(self.t_data[0], self.t_data[-1])
+        self.input_dynamic_ax.relim()
+        self.input_dynamic_ax.autoscale_view(scalex=False, scaley=True)
+        self.output_dynamic_ax.relim()
+        self.output_dynamic_ax.autoscale_view(scalex=False, scaley=True)
+
+        # Update canvas
+        self.dynamic_input_canvas.draw_idle()
+        self.dynamic_output_canvas.draw_idle()
+
+    def reset(self):
+        """
+        Resets GUI to initial state
+        """
+        # Reset entryboxes to default vals
+        self.a_param_entrybox.setText("5")
+        self.b_param_entrybox.setText("3")
+        self.f_param_entrybox.setText("1")
+        self.experiment_name_entrybox.setText("Test - Hurtado")
+                        
+        self.A = 5
+        self.B = 3
+        self.f = 1
+
+        # Reset control flags and initial time parameters
+        self.start_stop_flag = 0   
+        self.grid_toggle_flag = 0   
+        self.t_start = 0.0
+        self.dt = 0.05
+        self.t_data = np.linspace(self.t_start, 1/self.f, 1001)
+        self.drawing_timer.stop()
+
+        # Reset checkboxes
+        self.input_lambda_checkbox.setChecked(True)
+        self.output_function_checkbox.setChecked(True)
+        self.line_input.set_visible(True)
+        self.line_output.set_visible(True)
+
+        self.reset_plots()
+
+
 
          
         
