@@ -40,20 +40,22 @@ class PlotterApp(QtWidgets.QMainWindow):
         self.input_dynamic_ax = self.dynamic_input_canvas.figure.subplots()
         self.output_dynamic_ax = self.dynamic_output_canvas.figure.subplots()
 
-        # Set up the xdata space
-        self.xdata = np.linspace(0, self.f, 1001)
+        # Set up the initial tdata space
+        self.t_start = 0.0
+        self.dt = 0.05
+        self.t_data = np.linspace(self.t_start, 1/self.f, 1001)
+
         self.update_functions()
 
-        self.line_input, = self.input_dynamic_ax.plot(self.xdata, self.l_ydata)
-        self.line_output, = self.output_dynamic_ax.plot(self.xdata, self.h_ydata)
+        self.line_input, = self.input_dynamic_ax.plot(self.t_data, self.l_ydata)
+        self.line_output, = self.output_dynamic_ax.plot(self.t_data, self.h_ydata)
 
 
-        # Declare the timers that drive real-time update
-        self.data_timer = self.dynamic_input_canvas.new_timer(1)
-        self.data_timer.add_callback(self.update_functions)
-        
-        self.drawing_timer = self.dynamic_input_canvas.new_timer(20) #50Hz
+        # Declare the timer that drive real-time update
+        self.drawing_timer = self.dynamic_input_canvas.new_timer(50)
         self.drawing_timer.add_callback(self.update_canvas)
+
+        
 
     def set_widgets_actions(self):
         """
@@ -197,30 +199,42 @@ class PlotterApp(QtWidgets.QMainWindow):
         main_layout.addWidget(NavigationToolbar(self.dynamic_output_canvas, self),4,1,1,4)
 
     
-    def update_functions(self):
+    def update_functions(self):          
+
         # Shift the lambda function as a function of time.
-        self.l_ydata = self.A*np.sin(2*np.pi*self.f*self.xdata + time.time())
+        self.l_ydata = self.A*np.sin(2*np.pi*self.f*self.t_data)
         # Update y data of h(t)
         self.h_ydata = self.B*np.pi*np.exp(-self.l_ydata)
 
     def update_canvas(self):
+        # Advance time window by dt
+        self.t_start = self.t_start+self.dt
+
+        #Update the t_data
+        self.t_data = np.linspace(self.t_start,self.t_start+1/self.f,1001)
+
         # Update data
-        self.line_input.set_data(self.xdata, self.l_ydata)
-        self.line_output.set_data(self.xdata, self.h_ydata)
+        self.update_functions()
+        self.line_input.set_data(self.t_data, self.l_ydata)
+        self.line_output.set_data(self.t_data, self.h_ydata)
+
+        # Update xlim
+        self.input_dynamic_ax.set_xlim(self.t_data[0],self.t_data[-1])
+        self.output_dynamic_ax.set_xlim(self.t_data[0],self.t_data[-1])
 
         # Update canvas
         self.dynamic_output_canvas.draw_idle()
         self.dynamic_input_canvas.draw_idle()
+
 
           
 
     def start_stop(self):
         self.start_stop_flag = not self.start_stop_flag
         if self.start_stop_flag:
-            self.data_timer.start()
             self.drawing_timer.start()
+            self.start_time = time.time()
         else:
-            self.data_timer.stop()
             self.drawing_timer.stop()
 
     def grid_toggle(self):
@@ -235,15 +249,15 @@ class PlotterApp(QtWidgets.QMainWindow):
 
     def update_A(self):
         self.A = float(self.a_param_entrybox.text())
-        self.dynamic_input_canvas.draw_idle()
+        self.update_functions()
 
     def update_B(self):
         self.B = float(self.b_param_entrybox.text())
-        self.dynamic_output_canvas.draw_idle()
+        self.update_functions()
 
     def update_f(self):
         self.f = float(self.f_param_entrybox.text())
-        self.dynamic_input_canvas.draw_idle()
+        self.update_functions()
 
 
     def toggle_l_graph_visibility(self):
