@@ -17,7 +17,10 @@ class PlotterApp(QtWidgets.QMainWindow):
         # Declare initial parameter values for the functions λ(t), h(t)
         self.A = 5
         self.B = 3
-        self.f = 1      
+        self.f = 1
+
+        # Declare control flags
+        self.start_stop_flag = 0      
 
         # Create UI elements
         self.set_UI()
@@ -32,7 +35,7 @@ class PlotterApp(QtWidgets.QMainWindow):
         self.input_dynamic_ax = self.dynamic_input_canvas.figure.subplots()
         self.output_dynamic_ax = self.dynamic_output_canvas.figure.subplots()
 
-        # Set up a Line2D.
+        # Set up the xdata space
         self.xdata = np.linspace(0, 2*np.pi, 1001)
         self.update_functions()
 
@@ -43,11 +46,9 @@ class PlotterApp(QtWidgets.QMainWindow):
         # Declare the timers that drive real-time update
         self.data_timer = self.dynamic_input_canvas.new_timer(1)
         self.data_timer.add_callback(self.update_functions)
-        self.data_timer.start()
         
         self.drawing_timer = self.dynamic_input_canvas.new_timer(20) #50Hz
         self.drawing_timer.add_callback(self.update_canvas)
-        self.drawing_timer.start()
 
 
     def set_initial_values(self):
@@ -136,6 +137,8 @@ class PlotterApp(QtWidgets.QMainWindow):
         # Add Start/Stop button
         self.start_stop_button = QtWidgets.QPushButton("Start/Stop")
         left_panel_layout.addWidget(self.start_stop_button,9,0)
+        self.start_stop_button.clicked.connect(self.start_stop)
+
 
         # Add reset button
         self.reset_button = QtWidgets.QPushButton("Reset")
@@ -184,7 +187,15 @@ class PlotterApp(QtWidgets.QMainWindow):
         # Update canvas
         self.line_input.figure.canvas.draw_idle()
         self.line_output.figure.canvas.draw_idle()    
-    
+
+    def start_stop(self):
+        self.start_stop_flag = not self.start_stop_flag
+        if self.start_stop_flag:
+            self.data_timer.start()
+            self.drawing_timer.start()
+        else:
+            self.data_timer.stop()
+            self.drawing_timer.stop()
 
 
 if __name__ == '__main__':
