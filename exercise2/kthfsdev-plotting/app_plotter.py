@@ -32,6 +32,7 @@ class PlotterApp(QtWidgets.QMainWindow):
         # Set plot functions and timers
         self.set_plotting_functions()
 
+    
     def set_plotting_functions(self):
         self.input_dynamic_ax = self.dynamic_input_canvas.figure.subplots()
         self.output_dynamic_ax = self.dynamic_output_canvas.figure.subplots()
@@ -102,12 +103,16 @@ class PlotterApp(QtWidgets.QMainWindow):
 
         self.a_param_entrybox= QtWidgets.QLineEdit()
         left_panel_layout.addWidget(self.a_param_entrybox,3,1)
+        self.a_param_entrybox.returnPressed.connect(self.update_A)
+
 
         f_param_label = QtWidgets.QLabel("f")
         left_panel_layout.addWidget(f_param_label,4,0)
         
         self.f_param_entrybox= QtWidgets.QLineEdit()
         left_panel_layout.addWidget(self.f_param_entrybox,4,1)
+        self.f_param_entrybox.returnPressed.connect(self.update_f)
+
 
         # Add spacer element
         verticalSpacer2 = QtWidgets.QSpacerItem(5, 5, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding) 
@@ -129,7 +134,7 @@ class PlotterApp(QtWidgets.QMainWindow):
 
         self.b_param_entrybox= QtWidgets.QLineEdit()
         left_panel_layout.addWidget(self.b_param_entrybox,7,1)
-
+        self.b_param_entrybox.returnPressed.connect(self.update_B)
         #Add vertical spacer
         verticalSpacer3 = QtWidgets.QSpacerItem(5, 5, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding) 
         left_panel_layout.addItem(verticalSpacer3,8,1,1,2)
@@ -208,6 +213,13 @@ class PlotterApp(QtWidgets.QMainWindow):
 
         self.line_input.figure.canvas.draw_idle()
         self.line_output.figure.canvas.draw_idle() 
+
+    def update_A(self):
+            self.A = float(self.a_param_entrybox.text())
+    def update_B(self):
+            self.B = float(self.b_param_entrybox.text())
+    def update_f(self):
+            self.f = float(self.f_param_entrybox.text())
         
 
 if __name__ == '__main__':
