@@ -8,7 +8,12 @@ from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as Navigation
 from matplotlib.backends.qt_compat import QtWidgets
 from matplotlib.figure import Figure
 from PyQt6.QtCore import Qt
-from PyQt6 import QtGui
+from PyQt6 import QtGui,QtCore
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+ASSET_DIR = BASE_DIR / "assets"
+
 
 class PlotterApp(QtWidgets.QMainWindow):
     def __init__(self):
@@ -111,12 +116,14 @@ class PlotterApp(QtWidgets.QMainWindow):
 
         #Add Elements from the left panel
         # Add app header
-        header_label = QtWidgets.QLabel("FStudent KTH")
+        header_label = QtWidgets.QLabel("")
         left_panel_layout.addWidget(header_label, 0,0,1,2)
+        logo_pixmap = QtGui.QPixmap(f'{ASSET_DIR}/kthfslogo.png')        
+        header_label.setPixmap(logo_pixmap)
 
         # Add spacer
-        verticalSpacer1 = QtWidgets.QSpacerItem(5, 5, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding) 
-        left_panel_layout.addItem(verticalSpacer1,1,1,1,2)
+        #verticalSpacer1 = QtWidgets.QSpacerItem(5, 5, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding) 
+        #left_panel_layout.addItem(verticalSpacer1,1,1,1,2)
         
 
         # Add lambdafunction header
@@ -172,11 +179,17 @@ class PlotterApp(QtWidgets.QMainWindow):
         # Add Start/Stop button
         self.start_stop_button = QtWidgets.QPushButton("Start/Stop")
         left_panel_layout.addWidget(self.start_stop_button,9,0)
+        self.start_stop_button.setIcon(QtGui.QIcon(f"{ASSET_DIR}/play.png"))
+
+        
+        
 
 
         # Add reset button
         self.reset_button = QtWidgets.QPushButton("Reset")
         left_panel_layout.addWidget(self.reset_button,9,1)
+        self.reset_button.setIcon(QtGui.QIcon(f"{ASSET_DIR}/reset.png"))
+
         
 
         # Add rest of the elements
@@ -191,10 +204,13 @@ class PlotterApp(QtWidgets.QMainWindow):
         # Add Grid button
         self.grid_button = QtWidgets.QPushButton('Grid Toggle')
         main_layout.addWidget(self.grid_button,0,3)
+        self.grid_button.setIcon(QtGui.QIcon(f'{ASSET_DIR}/grid.png'))
 
         # Add custom export button
-        self.export_button = QtWidgets.QPushButton('export')
+        self.export_button = QtWidgets.QPushButton('')
         main_layout.addWidget(self.export_button,0,4)
+        self.export_button.setIcon(QtGui.QIcon(f'{ASSET_DIR}/share.png'))
+
 
         # Add Dynamic Input Canvas
         self.dynamic_input_canvas = FigureCanvas(Figure(figsize=(5, 3)))
@@ -249,8 +265,12 @@ class PlotterApp(QtWidgets.QMainWindow):
         self.start_stop_flag = not self.start_stop_flag
         if self.start_stop_flag:
             self.drawing_timer.start()
+            self.start_stop_button.setIcon(QtGui.QIcon(f"{ASSET_DIR}/stop.png"))
+
         else:
             self.drawing_timer.stop()
+            self.start_stop_button.setIcon(QtGui.QIcon(f"{ASSET_DIR}/play.png"))
+
 
     def grid_toggle(self):
         """
@@ -378,6 +398,10 @@ class PlotterApp(QtWidgets.QMainWindow):
         self.output_function_checkbox.setChecked(True)
         self.line_input.set_visible(True)
         self.line_output.set_visible(True)
+
+        #Reset icon
+        self.start_stop_button.setIcon(QtGui.QIcon(f"{ASSET_DIR}/play.png"))
+
 
         self.reset_plots()
 
