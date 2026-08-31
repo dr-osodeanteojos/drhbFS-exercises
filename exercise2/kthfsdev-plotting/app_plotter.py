@@ -249,16 +249,44 @@ class PlotterApp(QtWidgets.QMainWindow):
 
     def update_A(self):
         self.A = float(self.a_param_entrybox.text())
+        # Update canvas
         self.update_functions()
+        self.line_input.set_ydata(self.l_ydata)
+        self.input_dynamic_ax.relim()
+        self.input_dynamic_ax.autoscale_view(scalex=False, scaley=True)
+        self.dynamic_input_canvas.draw_idle()
+        self.line_output.set_ydata(self.h_ydata)
+        self.output_dynamic_ax.relim()
+        self.output_dynamic_ax.autoscale_view(scalex=False, scaley=True)
+
+        self.dynamic_output_canvas.draw_idle()
+
 
     def update_B(self):
         self.B = float(self.b_param_entrybox.text())
+        # Update canvas
         self.update_functions()
+        self.line_output.set_ydata(self.h_ydata)
+        self.output_dynamic_ax.relim()
+        self.output_dynamic_ax.autoscale_view(scalex=False, scaley=True)
+
+        self.dynamic_output_canvas.draw_idle()
 
     def update_f(self):
         self.f = float(self.f_param_entrybox.text())
-        self.update_functions()
 
+        # Update canvas
+        self.t_data = np.linspace(self.t_start,self.t_start+1/self.f,1001)
+        self.update_functions()
+        self.line_input.set_data(self.t_data, self.l_ydata)
+        self.line_output.set_data(self.t_data, self.h_ydata)
+        self.dynamic_input_canvas.draw_idle()
+
+        # Update xlim with updated t_data (f changed)
+        self.input_dynamic_ax.set_xlim(self.t_data[0],self.t_data[-1])
+        self.output_dynamic_ax.set_xlim(self.t_data[0],self.t_data[-1])
+
+        self.dynamic_output_canvas.draw_idle()
 
     def toggle_l_graph_visibility(self):
         self.line_input.set_visible(self.input_lambda_checkbox.isChecked())
