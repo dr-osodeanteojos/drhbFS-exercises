@@ -41,7 +41,7 @@ class PlotterApp(QtWidgets.QMainWindow):
         self.output_dynamic_ax = self.dynamic_output_canvas.figure.subplots()
 
         # Set up the xdata space
-        self.xdata = np.linspace(0, 2*np.pi, 1001)
+        self.xdata = np.linspace(0, self.f, 1001)
         self.update_functions()
 
         self.line_input, = self.input_dynamic_ax.plot(self.xdata, self.l_ydata)
@@ -201,18 +201,18 @@ class PlotterApp(QtWidgets.QMainWindow):
         # Shift the lambda function as a function of time.
         self.l_ydata = self.A*np.sin(2*np.pi*self.f*self.xdata + time.time())
         # Update y data of h(t)
-        self.h_ydata = self.B*np.pi*np.exp(self.l_ydata)
+        self.h_ydata = self.B*np.pi*np.exp(-self.l_ydata)
 
     def update_canvas(self):
         # Update data
         self.line_input.set_data(self.xdata, self.l_ydata)
-        self.line_output.set_data(self.xdata, self.l_ydata)
+        self.line_output.set_data(self.xdata, self.h_ydata)
 
         # Update canvas
-        self.line_input.figure.canvas.draw_idle()
-        self.line_output.figure.canvas.draw_idle()
+        self.dynamic_output_canvas.draw_idle()
+        self.dynamic_input_canvas.draw_idle()
 
-        #    
+          
 
     def start_stop(self):
         self.start_stop_flag = not self.start_stop_flag
@@ -235,10 +235,16 @@ class PlotterApp(QtWidgets.QMainWindow):
 
     def update_A(self):
         self.A = float(self.a_param_entrybox.text())
+        self.dynamic_input_canvas.draw_idle()
+
     def update_B(self):
         self.B = float(self.b_param_entrybox.text())
+        self.dynamic_output_canvas.draw_idle()
+
     def update_f(self):
         self.f = float(self.f_param_entrybox.text())
+        self.dynamic_input_canvas.draw_idle()
+
 
     def toggle_l_graph_visibility(self):
         self.line_input.set_visible(self.input_lambda_checkbox.isChecked())
