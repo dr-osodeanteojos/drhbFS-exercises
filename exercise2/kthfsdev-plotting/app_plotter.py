@@ -14,17 +14,42 @@ class PlotterApp(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
 
-        # Declare initial parameter values for the functions
+        # Declare initial parameter values for the functions λ(t), h(t)
         self.A = 5
         self.B = 3
-        self.f = 1
+        self.f = 1      
 
         # Create UI elements
         self.set_UI()
 
         # Set initial values of the UI
         self.set_initial_values()
+
+        # Set plot functions and timers
+        self.set_plotting_functions()
+
+    def set_plotting_functions(self):
+        self.input_dynamic_ax = self.dynamic_input_canvas.figure.subplots()
+        self.output_dynamic_ax = self.dynamic_output_canvas.figure.subplots()
+
+        # Set up a Line2D.
+        self.xdata = np.linspace(0, 2*np.pi, 1001)
+        self.update_functions()
+
+        self.line_input, = self.input_dynamic_ax.plot(self.xdata, self.l_ydata)
+        self.line_output, = self.output_dynamic_ax.plot(self.xdata, self.h_ydata)
+
+
+        # Declare the timers that drive real-time update
+        self.data_timer = self.dynamic_input_canvas.new_timer(1)
+        self.data_timer.add_callback(self.update_functions)
+        self.data_timer.start()
         
+        self.drawing_timer = self.dynamic_input_canvas.new_timer(20) #50Hz
+        self.drawing_timer.add_callback(self.update_canvas)
+        self.drawing_timer.start()
+
+
     def set_initial_values(self):
         # Add initial parameters values to the corresponding line edits
         self.a_param_entrybox.setText(f"{self.A}")
@@ -135,32 +160,31 @@ class PlotterApp(QtWidgets.QMainWindow):
         main_layout.addWidget(self.export_button,0,4)
 
         # Add Dynamic Input Canvas
-        dynamic__input_canvas = FigureCanvas(Figure(figsize=(5, 3)))
-        main_layout.addWidget(dynamic__input_canvas,1,1,1,4)
-        main_layout.addWidget(NavigationToolbar(dynamic__input_canvas, self),2,1,1,4)
+        self.dynamic_input_canvas = FigureCanvas(Figure(figsize=(5, 3)))
+        main_layout.addWidget(self.dynamic_input_canvas,1,1,1,4)
+        main_layout.addWidget(NavigationToolbar(self.dynamic_input_canvas, self),2,1,1,4)
 
         # Add Dynamic Output Canvas
-        dynamic__output_canvas = FigureCanvas(Figure(figsize=(5, 3)))
-        main_layout.addWidget(dynamic__output_canvas,3,1,1,4)
-        main_layout.addWidget(NavigationToolbar(dynamic__output_canvas, self),4,1,1,4)
+        self.dynamic_output_canvas = FigureCanvas(Figure(figsize=(5, 3)))
+        main_layout.addWidget(self.dynamic_output_canvas,3,1,1,4)
+        main_layout.addWidget(NavigationToolbar(self.dynamic_output_canvas, self),4,1,1,4)
 
-
-
-        #self._dynamic_ax = dynamic__input_canvas.figure.subplots()
-        # Set up a Line2D.
-        #self.xdata = np.linspace(0, 10, 101)
-        #self.update_ydata()
-        #self._line, = self._dynamic_ax.plot(self.xdata, self.ydata)
     
-    def update_ydata(self):
-        # Shift the sinusoid as a function of time.
-        self.ydata = np.sin(self.xdata + time.time())
+    def update_functions(self):
+        # Shift the lambda function as a function of time.
+        self.l_ydata = self.A*np.sin(2*np.pi*self.f*self.xdata + time.time())
+        # Update y data of h(t)
+        self.h_ydata = self.B*np.pi*np.exp(self.l_ydata)
 
     def update_canvas(self):
-        self._line.set_data(self.xdata, self.ydata)
-        # It should be safe to use the synchronous draw() method for most drawing
-        # frequencies, but it is safer to use draw_idle().
-        self._line.figure.canvas.draw_idle()    
+        # Update data
+        self.line_input.set_data(self.xdata, self.l_ydata)
+        self.line_output.set_data(self.xdata, self.l_ydata)
+
+        # Update canvas
+        self.line_input.figure.canvas.draw_idle()
+        self.line_output.figure.canvas.draw_idle()    
+    
 
 
 if __name__ == '__main__':
