@@ -206,10 +206,12 @@ class PlotterApp(QtWidgets.QMainWindow):
         main_layout.addWidget(self.grid_button,0,3)
         self.grid_button.setIcon(QtGui.QIcon(f'{ASSET_DIR}/grid.png'))
 
-        # Add custom export button
+        # Add custom export button (Disable it for now because function hasn't been implemented)
         self.export_button = QtWidgets.QPushButton('')
         main_layout.addWidget(self.export_button,0,4)
         self.export_button.setIcon(QtGui.QIcon(f'{ASSET_DIR}/share.png'))
+        self.export_button.setToolTip("Export feature not available yet")
+        self.export_button.setEnabled(False)
 
 
         # Add Dynamic Input Canvas
