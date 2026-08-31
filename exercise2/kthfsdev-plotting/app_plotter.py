@@ -77,6 +77,10 @@ class PlotterApp(QtWidgets.QMainWindow):
 
 
     def set_initial_values(self):
+        """
+        Set the default values for lineEdits,
+        and initial states for checkboxes
+        """
         # Add initial parameters values to the corresponding line edits
         self.a_param_entrybox.setText(f"{self.A}")
         self.b_param_entrybox.setText(f"{self.B}")
@@ -90,6 +94,9 @@ class PlotterApp(QtWidgets.QMainWindow):
         self.experiment_name_entrybox.setText("Test - Hurtado")
                         
     def set_UI(self):
+        """
+        Declare all elements of the GUI
+        """
         # Set window title
         self.setWindowTitle("Graph Plotter")
         # Declare main widget of the app
@@ -199,14 +206,19 @@ class PlotterApp(QtWidgets.QMainWindow):
         main_layout.addWidget(NavigationToolbar(self.dynamic_output_canvas, self),4,1,1,4)
 
     
-    def update_functions(self):          
-
+    def update_functions(self):
+        """
+        Update lambda and h on the t_data time vector
+        """          
         # Shift the lambda function as a function of time.
         self.l_ydata = self.A*np.sin(2*np.pi*self.f*self.t_data)
         # Update y data of h(t)
         self.h_ydata = self.B*np.pi*np.exp(-self.l_ydata)
 
     def update_canvas(self):
+        """
+        Advance simulation time and update the data
+        """
         # Advance time window by dt
         self.t_start = self.t_start+self.dt
 
@@ -230,15 +242,19 @@ class PlotterApp(QtWidgets.QMainWindow):
           
 
     def start_stop(self):
+        """
+        Start/Stop button action
+        """
         self.start_stop_flag = not self.start_stop_flag
         if self.start_stop_flag:
             self.drawing_timer.start()
-            self.start_time = time.time()
         else:
             self.drawing_timer.stop()
 
     def grid_toggle(self):
-        "Add grid to both graph according to toggled state"
+        """
+        Add grid to both graph according to toggled state
+        """
 
         self.grid_toggle_flag = not self.grid_toggle_flag               
         self.input_dynamic_ax.grid(self.grid_toggle_flag)
@@ -248,6 +264,9 @@ class PlotterApp(QtWidgets.QMainWindow):
         self.line_output.figure.canvas.draw_idle() 
 
     def update_A(self):
+        """
+        Update of A parameter for l(t)
+        """
         self.A = float(self.a_param_entrybox.text())
         # Update canvas
         self.update_functions()
@@ -263,6 +282,9 @@ class PlotterApp(QtWidgets.QMainWindow):
 
 
     def update_B(self):
+        """
+        Update of B parameter for h(t)
+        """
         self.B = float(self.b_param_entrybox.text())
         # Update canvas
         self.update_functions()
@@ -273,6 +295,9 @@ class PlotterApp(QtWidgets.QMainWindow):
         self.dynamic_output_canvas.draw_idle()
 
     def update_f(self):
+        """
+        Update of f parameter for l(t)
+        """
         self.f = float(self.f_param_entrybox.text())
 
         # Update canvas
@@ -289,10 +314,16 @@ class PlotterApp(QtWidgets.QMainWindow):
         self.dynamic_output_canvas.draw_idle()
 
     def toggle_l_graph_visibility(self):
+        """
+        Checkbox l(t) function state change action
+        """
         self.line_input.set_visible(self.input_lambda_checkbox.isChecked())
         self.dynamic_input_canvas.draw_idle()
 
     def toggle_h_graph_visibility(self):
+        """
+        Checkbox h(t) function state change action
+        """
         self.line_output.set_visible(self.output_function_checkbox.isChecked())
         self.dynamic_output_canvas.draw_idle()
 
