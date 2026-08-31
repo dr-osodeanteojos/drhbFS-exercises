@@ -13,11 +13,37 @@ from PyQt6 import QtGui
 class PlotterApp(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self._main = QtWidgets.QWidget()
-        self.setCentralWidget(self._main)
+
+        # Declare initial parameter values for the functions
+        self.A = 5
+        self.B = 3
+        self.f = 1
+
+        # Create UI elements
         self.set_UI()
 
+        # Set initial values of the UI
+        self.set_initial_values()
+        
+    def set_initial_values(self):
+        # Add initial parameters values to the corresponding line edits
+        self.a_param_entrybox.setText(f"{self.A}")
+        self.b_param_entrybox.setText(f"{self.B}")
+        self.f_param_entrybox.setText(f"{self.f}")
+    
+        # Set checkboxes to true
+        self.input_lambda_checkbox.setChecked(True)
+        self.output_function_checkbox.setChecked(True)
+
+        # Add dummy text for experiment
+        self.experiment_name_entrybox.setText("Test - Hurtado")
+                        
     def set_UI(self):
+        # Set window title
+        self.setWindowTitle("Graph Plotter")
+        # Declare main widget of the app
+        self._main = QtWidgets.QWidget()
+        self.setCentralWidget(self._main)
         # Declare main layout grid and add a left panel grid layout
         main_layout = QtWidgets.QGridLayout(self._main)
         left_panel_layout = QtWidgets.QGridLayout()
@@ -35,26 +61,26 @@ class PlotterApp(QtWidgets.QMainWindow):
         
 
         # Add lambdafunction header
-        input_lambda_function = QtWidgets.QLabel(
+        input_lambda_function_label = QtWidgets.QLabel(
             "Input Lambda Function \n" \
             " λ(t) = A sin(2πft)")
-        left_panel_layout.addWidget(input_lambda_function, 2,0)
+        left_panel_layout.addWidget(input_lambda_function_label, 2,0)
 
-        input_lambda_checkbox = QtWidgets.QCheckBox()
-        left_panel_layout.addWidget(input_lambda_checkbox, 2,1)
+        self.input_lambda_checkbox = QtWidgets.QCheckBox()
+        left_panel_layout.addWidget(self.input_lambda_checkbox, 2,1)
         
         # Add modifiable parameters
         a_param_label = QtWidgets.QLabel("A")
         left_panel_layout.addWidget(a_param_label,3,0)
 
-        a_param_entrybox= QtWidgets.QLineEdit()
-        left_panel_layout.addWidget(a_param_entrybox,3,1)
+        self.a_param_entrybox= QtWidgets.QLineEdit()
+        left_panel_layout.addWidget(self.a_param_entrybox,3,1)
 
         f_param_label = QtWidgets.QLabel("f")
         left_panel_layout.addWidget(f_param_label,4,0)
         
-        f_param_entrybox= QtWidgets.QLineEdit()
-        left_panel_layout.addWidget(f_param_entrybox,4,1)
+        self.f_param_entrybox= QtWidgets.QLineEdit()
+        left_panel_layout.addWidget(self.f_param_entrybox,4,1)
 
         # Add spacer element
         verticalSpacer2 = QtWidgets.QSpacerItem(5, 5, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding) 
@@ -67,15 +93,15 @@ class PlotterApp(QtWidgets.QMainWindow):
                     " h(t) = Bπ exp(-λ(t))")
         left_panel_layout.addWidget(output_function, 6,0)
 
-        output_function_checkbox = QtWidgets.QCheckBox()
-        left_panel_layout.addWidget(output_function_checkbox, 6,1)
+        self.output_function_checkbox = QtWidgets.QCheckBox()
+        left_panel_layout.addWidget(self.output_function_checkbox, 6,1)
 
         # Add modifiable parameters
         b_param_label = QtWidgets.QLabel("B")
         left_panel_layout.addWidget(b_param_label,7,0)
 
-        b_param_entrybox= QtWidgets.QLineEdit()
-        left_panel_layout.addWidget(b_param_entrybox,7,1)
+        self.b_param_entrybox= QtWidgets.QLineEdit()
+        left_panel_layout.addWidget(self.b_param_entrybox,7,1)
 
         #Add vertical spacer
         verticalSpacer3 = QtWidgets.QSpacerItem(5, 5, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding) 
@@ -120,12 +146,12 @@ class PlotterApp(QtWidgets.QMainWindow):
 
 
 
-        self._dynamic_ax = dynamic__input_canvas.figure.subplots()
+        #self._dynamic_ax = dynamic__input_canvas.figure.subplots()
         # Set up a Line2D.
-        self.xdata = np.linspace(0, 10, 101)
-        self.update_ydata()
-        self._line, = self._dynamic_ax.plot(self.xdata, self.ydata)
-        
+        #self.xdata = np.linspace(0, 10, 101)
+        #self.update_ydata()
+        #self._line, = self._dynamic_ax.plot(self.xdata, self.ydata)
+    
     def update_ydata(self):
         # Shift the sinusoid as a function of time.
         self.ydata = np.sin(self.xdata + time.time())
