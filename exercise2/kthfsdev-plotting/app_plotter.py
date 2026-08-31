@@ -32,6 +32,9 @@ class PlotterApp(QtWidgets.QMainWindow):
         # Set plot functions and timers
         self.set_plotting_functions()
 
+        # Connect widgets signals to actions
+        self.set_widgets_actions()
+
     
     def set_plotting_functions(self):
         self.input_dynamic_ax = self.dynamic_input_canvas.figure.subplots()
@@ -51,6 +54,24 @@ class PlotterApp(QtWidgets.QMainWindow):
         
         self.drawing_timer = self.dynamic_input_canvas.new_timer(20) #50Hz
         self.drawing_timer.add_callback(self.update_canvas)
+
+    def set_widgets_actions(self):
+        """
+        Connect the widgets signals to corresponding actions
+        for GUI interactions
+        """
+        # QCheckboxes
+        self.input_lambda_checkbox.checkStateChanged.connect(self.toggle_l_graph_visibility)
+        self.output_function_checkbox.checkStateChanged.connect(self.toggle_h_graph_visibility)
+
+        # QlineEdits
+        self.a_param_entrybox.returnPressed.connect(self.update_A)
+        self.f_param_entrybox.returnPressed.connect(self.update_f)
+        self.b_param_entrybox.returnPressed.connect(self.update_B)
+
+        # QPushButtons
+        self.start_stop_button.clicked.connect(self.start_stop)
+        self.grid_button.clicked.connect(self.grid_toggle)
 
 
     def set_initial_values(self):
@@ -103,7 +124,6 @@ class PlotterApp(QtWidgets.QMainWindow):
 
         self.a_param_entrybox= QtWidgets.QLineEdit()
         left_panel_layout.addWidget(self.a_param_entrybox,3,1)
-        self.a_param_entrybox.returnPressed.connect(self.update_A)
 
 
         f_param_label = QtWidgets.QLabel("f")
@@ -111,7 +131,6 @@ class PlotterApp(QtWidgets.QMainWindow):
         
         self.f_param_entrybox= QtWidgets.QLineEdit()
         left_panel_layout.addWidget(self.f_param_entrybox,4,1)
-        self.f_param_entrybox.returnPressed.connect(self.update_f)
 
 
         # Add spacer element
@@ -134,7 +153,7 @@ class PlotterApp(QtWidgets.QMainWindow):
 
         self.b_param_entrybox= QtWidgets.QLineEdit()
         left_panel_layout.addWidget(self.b_param_entrybox,7,1)
-        self.b_param_entrybox.returnPressed.connect(self.update_B)
+
         #Add vertical spacer
         verticalSpacer3 = QtWidgets.QSpacerItem(5, 5, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding) 
         left_panel_layout.addItem(verticalSpacer3,8,1,1,2)
@@ -143,7 +162,6 @@ class PlotterApp(QtWidgets.QMainWindow):
         # Add Start/Stop button
         self.start_stop_button = QtWidgets.QPushButton("Start/Stop")
         left_panel_layout.addWidget(self.start_stop_button,9,0)
-        self.start_stop_button.clicked.connect(self.start_stop)
 
 
         # Add reset button
@@ -163,7 +181,6 @@ class PlotterApp(QtWidgets.QMainWindow):
         # Add Grid button
         self.grid_button = QtWidgets.QPushButton('Grid Toggle')
         main_layout.addWidget(self.grid_button,0,3)
-        self.grid_button.clicked.connect(self.grid_toggle)
 
         # Add custom export button
         self.export_button = QtWidgets.QPushButton('export')
@@ -193,7 +210,9 @@ class PlotterApp(QtWidgets.QMainWindow):
 
         # Update canvas
         self.line_input.figure.canvas.draw_idle()
-        self.line_output.figure.canvas.draw_idle()    
+        self.line_output.figure.canvas.draw_idle()
+
+        #    
 
     def start_stop(self):
         self.start_stop_flag = not self.start_stop_flag
@@ -215,11 +234,21 @@ class PlotterApp(QtWidgets.QMainWindow):
         self.line_output.figure.canvas.draw_idle() 
 
     def update_A(self):
-            self.A = float(self.a_param_entrybox.text())
+        self.A = float(self.a_param_entrybox.text())
     def update_B(self):
-            self.B = float(self.b_param_entrybox.text())
+        self.B = float(self.b_param_entrybox.text())
     def update_f(self):
-            self.f = float(self.f_param_entrybox.text())
+        self.f = float(self.f_param_entrybox.text())
+
+    def toggle_l_graph_visibility(self):
+        self.line_input.set_visible(self.input_lambda_checkbox.isChecked())
+        self.dynamic_input_canvas.draw_idle()
+
+    def toggle_h_graph_visibility(self):
+        self.line_output.set_visible(self.output_function_checkbox.isChecked())
+        self.dynamic_output_canvas.draw_idle()
+
+         
         
 
 if __name__ == '__main__':
